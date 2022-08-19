@@ -72,7 +72,7 @@ credentials = {
 gc = gspread.service_account_from_dict(credentials)
 sh = gc.open_by_key(os.environ.get('SPREADSHEET_KEY'))
 
-wks = sh.worksheet('Counts2')
+wks = sh.worksheet('Counts')
 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 wks.append_row([now, 'maintenance points', '', total_story_points], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance issues', '', len(issues)], value_input_option="USER_ENTERED", table_range='A1')

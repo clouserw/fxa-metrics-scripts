@@ -104,7 +104,7 @@ credentials = {
 gc = gspread.service_account_from_dict(credentials)
 sh = gc.open_by_key(os.environ.get('SPREADSHEET_KEY'))
 
-wks = sh.worksheet('Counts2')
+wks = sh.worksheet('Counts')
 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 wks.append_row([now, 'security issues', 'open', total], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'no-sec-score', 'open', sec_none_total], value_input_option="USER_ENTERED", table_range='A1')
