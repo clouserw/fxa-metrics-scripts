@@ -5,12 +5,22 @@ import sys
 import gspread
 from jira import JIRA
 
+if not "JIRA_EMAIL" in os.environ:
+    print("Please set environment variables")
+    sys.exit(1)
+
+if not "JIRA_TOKEN" in os.environ:
+    print("Please set environment variables")
+    sys.exit(1)
+
 if not "SPREADSHEET_KEY" in os.environ:
     print("Please set environment variables")
     sys.exit(1)
 
 
-jira = JIRA(server="https://mozilla-hub.atlassian.net")
+jira = JIRA(basic_auth=(os.environ.get('JIRA_EMAIL'),
+                        os.environ.get('JIRA_TOKEN')),
+            server="https://mozilla-hub.atlassian.net")
 
 chunk = 100 # Appears to be the max for the API...
 index = 0
