@@ -19,12 +19,14 @@ Additionally, there aren't a lot of guardrails or error checking...
 I pass configuration into the scripts using environment variables.  Fill in the
 values in `local.env` and source it into your environment before running the
 scripts.
+1. `pip install -r requirements.txt`
+2. `cp local.env-dist local.env`
+3. `source local.env`
+4. `python <script>`
 
 
 
 ## Scheduling
-I run all of these on cron jobs, spread out throughout the night to avoid API
-limits.
 
 To run a cron job from a virtualenv:
 
@@ -37,3 +39,6 @@ To run a cron job with specific environment variables within a virtualenv:
 ```
 * * * * * . /path/to/fxa-metrics-scripts/local.env; /path/to/virtualenv/bin/python /path/to/fxa-metrics-scripts/copy_jira_data_to_sheets.py
 ```
+
+To run from heroku use the scheduling add-on with commands like `python
+<script>.py`
