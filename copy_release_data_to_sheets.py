@@ -20,7 +20,7 @@ credentials = {
 gc = gspread.service_account_from_dict(credentials)
 sh = gc.open_by_key(os.environ.get('SPREADSHEET_KEY'))
 
-wks = sh.worksheet('td2')
+wks = sh.worksheet('Tag Data')
 
 # doesn't include customs or admin, which aren't available on the net
 servers = [
