@@ -27,7 +27,7 @@ index = 0
 issues = []
 while True:
     startAt = index * chunk
-    _issues = jira.search_issues('project=FXA and labels in (maintenance) and resolution is empty and (component not in ("Subscription Platform") or component is empty)', startAt=startAt, maxResults=chunk)
+    _issues = jira.search_issues('project=FXA and labels in (maintenance) and type in (task,story,bug) and resolution is empty and (component not in ("Subscription Platform") or component is empty)', startAt=startAt, maxResults=chunk)
     #print(f"startat: {startAt} len: {len(_issues)}")
     if len(_issues):
         for i in _issues:
@@ -55,6 +55,73 @@ for issue in issues:
         # Haven't had time to debug...There are usually ~<10
         print(f"Caught exception: {e}")
 
+# More effecient to do a single query and iterate through it, but I'm writing
+# this while in a meeting and copy/paste is easier
+index = 0
+non_maintenance_issues = []
+while True:
+    startAt = index * chunk
+    _issues = jira.search_issues('project=FXA and (labels is EMPTY or labels not in (maintenance)) and type in (task,story) and resolution is empty and (component not in ("Subscription Platform") or component is empty)', startAt=startAt, maxResults=chunk)
+    #print(f"startat: {startAt} len: {len(_issues)}")
+    if len(_issues):
+        for i in _issues:
+            non_maintenance_issues.append(i)
+        index += 1
+    else:
+        break
+
+non_maintenance_non_bug_story_points = 0
+non_maintenance_non_bug_issues_with_no_points = 0
+
+for issue in non_maintenance_issues:
+    try:
+        # Story Points
+        if issue.fields.customfield_10037:
+            _story_points = issue.fields.customfield_10037
+        else:
+            _story_points = 0
+            non_maintenance_non_bug_issues_with_no_points = non_maintenance_non_bug_issues_with_no_points + 1
+
+        non_maintenance_non_bug_story_points = non_maintenance_non_bug_story_points + _story_points
+
+    except Exception as e:
+        # exceptions started getting thrown with the move to atlassian host.
+        # Haven't had time to debug...There are usually ~<10
+        print(f"Caught exception: {e}")
+
+# More effecient to do a single query and iterate through it, but I'm writing
+# this while in a meeting and copy/paste is easier
+index = 0
+non_maintenance_bugs = []
+while True:
+    startAt = index * chunk
+    _issues = jira.search_issues('project=FXA and (labels is empty or labels not in (maintenance)) and type in (bug) and resolution is empty and (component not in ("Subscription Platform") or component is empty)', startAt=startAt, maxResults=chunk)
+    #print(f"startat: {startAt} len: {len(_issues)}")
+    if len(_issues):
+        for i in _issues:
+            non_maintenance_bugs.append(i)
+        index += 1
+    else:
+        break
+
+non_maintenance_bug_story_points = 0
+non_maintenance_bugs_with_no_points = 0
+
+for issue in non_maintenance_bugs:
+    try:
+        # Story Points
+        if issue.fields.customfield_10037:
+            _story_points = issue.fields.customfield_10037
+        else:
+            _story_points = 0
+            non_maintenance_bugs_with_no_points = non_maintenance_bugs_with_no_points + 1
+
+        non_maintenance_bug_story_points = non_maintenance_bug_story_points + _story_points
+
+    except Exception as e:
+        # exceptions started getting thrown with the move to atlassian host.
+        # Haven't had time to debug...There are usually ~<10
+        print(f"Caught exception: {e}")
 
 credentials = {
     "type": "service_account",
@@ -77,3 +144,9 @@ now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 wks.append_row([now, 'maintenance points', '', total_story_points], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance issues', '', len(issues)], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance issues with no points', '', total_issues_with_no_points], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance task points', '', non_maintenance_non_bug_story_points], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance tasks', '', len(non_maintenance_issues)], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance tasks with no points', '', non_maintenance_non_bug_issues_with_no_points], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance bug points', '', non_maintenance_bug_story_points], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance bugs', '', len(non_maintenance_bugs)], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'non-maintenance bugs with no points', '', non_maintenance_bugs_with_no_points], value_input_option="USER_ENTERED", table_range='A1')
