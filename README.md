@@ -24,7 +24,13 @@ scripts.
 3. `source local.env`
 4. `python <script>`
 
+## Heroku
 
+You'll need both nodejs and python buildpacks.
+
+```
+heroku buildpacks:add --index 1 heroku/nodejs
+```
 
 ## Scheduling
 
