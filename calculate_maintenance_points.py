@@ -123,6 +123,30 @@ for issue in non_maintenance_bugs:
         # Haven't had time to debug...There are usually ~<10
         print(f"Caught exception: {e}")
 
+
+
+# If you send maxResults=0 to the Jira API you only get a small json back with the total in it.  I suspect the python-jira library is replacing those results with it's own heavy query but I don't have time to dig into it now.  That may also mean this is susceptible to the 100 issue return limit of the API, but I'm not going to test that right now.  Edit: I got a result of 197 back, so, looks like it's not or the API limit went up.
+
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels in (oauth)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+maintenance_issues_cat_oauth = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels in (dependencies)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+maintenance_issues_cat_dependencies = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels in (sentry)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+maintenance_issues_cat_sentry = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels not in (dependencies,oauth,sentry)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+maintenance_issues_cat_other = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (needsproduct)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+issues_needs_product = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (needsux)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+issues_needs_ux = len(_ret)
+
+
+
 credentials = {
     "type": "service_account",
     "project_id": os.environ.get('GSPREAD_PROJECT_ID'),
@@ -150,3 +174,10 @@ wks.append_row([now, 'non-maintenance tasks with no points', '', non_maintenance
 wks.append_row([now, 'non-maintenance bug points', '', non_maintenance_bug_story_points], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'non-maintenance bugs', '', len(non_maintenance_bugs)], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'non-maintenance bugs with no points', '', non_maintenance_bugs_with_no_points], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'maintenance_issues_cat_oauth', '', maintenance_issues_cat_oauth], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'maintenance_issues_cat_dependencies', '', maintenance_issues_cat_dependencies], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'maintenance_issues_cat_sentry', '', maintenance_issues_cat_sentry], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'maintenance_issues_cat_other', '', maintenance_issues_cat_other], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'issues_needs_product', '', issues_needs_product], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'issues_needs_ux', '', issues_needs_ux], value_input_option="USER_ENTERED", table_range='A1')
+
