@@ -26,7 +26,7 @@ scripts.
 
 ## Heroku
 
-You'll need both nodejs and python buildpacks.
+This is mildly sketchy.  This is a python project and you use the python buildpack for it.  However, to calculate outdated dependencies for Mozilla Accounts I need the `yarn` command to exist.  Heroku will install it for me if it thinks I'm running a Node project, so, I have an empty `package.json` and `yarn.lock` file in the root and have told Heroku to run the `nodejs` builpack before the `python` one:
 
 ```
 heroku buildpacks:add --index 1 heroku/nodejs
