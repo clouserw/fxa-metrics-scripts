@@ -136,8 +136,13 @@ maintenance_issues_cat_dependencies = len(_ret)
 _ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels in (sentry)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
 maintenance_issues_cat_sentry = len(_ret)
 
-_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels not in (dependencies,oauth,sentry)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels in (Tests)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+maintenance_issues_cat_tests = len(_ret)
+
+_ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels not in (dependencies,oauth,sentry,Tests)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
 maintenance_issues_cat_other = len(_ret)
+
+
 
 _ret = jira.search_issues('project=FXA and (labels in (needsproduct)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
 issues_needs_product = len(_ret)
@@ -177,6 +182,7 @@ wks.append_row([now, 'non-maintenance bugs with no points', '', non_maintenance_
 wks.append_row([now, 'maintenance_issues_cat_oauth', '', maintenance_issues_cat_oauth], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance_issues_cat_dependencies', '', maintenance_issues_cat_dependencies], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance_issues_cat_sentry', '', maintenance_issues_cat_sentry], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'maintenance_issues_cat_tests', '', maintenance_issues_cat_tests], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance_issues_cat_other', '', maintenance_issues_cat_other], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'issues_needs_product', '', issues_needs_product], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'issues_needs_ux', '', issues_needs_ux], value_input_option="USER_ENTERED", table_range='A1')
