@@ -143,7 +143,11 @@ _ret = jira.search_issues('project=FXA and (labels in (maintenance) AND labels n
 maintenance_issues_cat_other = len(_ret)
 
 
+# Security issues
+_ret = jira.search_issues('project=FXA and (labels in (security)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
+issues_security = len(_ret)
 
+# Blocked by Product / UX
 _ret = jira.search_issues('project=FXA and (labels in (needsproduct)) and resolution is empty and (component not in ("Subscription Platform") or component is empty) order by created asc', startAt=0, maxResults=0)
 issues_needs_product = len(_ret)
 
@@ -184,6 +188,7 @@ wks.append_row([now, 'maintenance_issues_cat_dependencies', '', maintenance_issu
 wks.append_row([now, 'maintenance_issues_cat_sentry', '', maintenance_issues_cat_sentry], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance_issues_cat_tests', '', maintenance_issues_cat_tests], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'maintenance_issues_cat_other', '', maintenance_issues_cat_other], value_input_option="USER_ENTERED", table_range='A1')
+wks.append_row([now, 'issues_security', '', issues_security], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'issues_needs_product', '', issues_needs_product], value_input_option="USER_ENTERED", table_range='A1')
 wks.append_row([now, 'issues_needs_ux', '', issues_needs_ux], value_input_option="USER_ENTERED", table_range='A1')
 
