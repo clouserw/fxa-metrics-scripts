@@ -14,9 +14,7 @@ repositories = ["mozilla/fxa",
                 "mozilla/fxa-content-server-l10n",
                 "mozilla/ecosystem-platform",
                 "mozilla/eslint-plugin-fxa",
-                "mozilla/fxa-common-password-list",
                 "mozilla/fxa-crypto-relier",
-                "mozilla/fxa-jwtool",
                 "mozilla/fxa-pairing-channel",
                 "mozilla/mozlog",
                 "mozilla/sandboxed-regexp",
@@ -32,7 +30,6 @@ repositories = ["mozilla/fxa",
                 "mozilla-fxa/chosen",
                 "mozilla-fxa/node-uap",
                 "mozilla-fxa/grunt-po2json",
-                "mozilla-fxa/gobbledygook",
                 ]
 
 try:
