@@ -32,7 +32,11 @@ This is mildly sketchy.  This is a python project and you use the python buildpa
 heroku buildpacks:add --index 1 heroku/nodejs
 ```
 
-Update: it's getting sketchier!  Now I also need the npm `lighthouse` package to be installed.  Let's see if filling in package.json helps...
+Update: it's getting sketchier!  Now I also need the npm `lighthouse` package to be installed.  Let's see if filling in package.json helps.  Lighthouse is not pulling in chrome.  Let's try this too:
+
+```
+heroku buildpacks:add --index 3 heroku-community/chrome-for-testing
+```
 
 ## Scheduling
 
