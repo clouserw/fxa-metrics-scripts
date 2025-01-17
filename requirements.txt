@@ -4,3 +4,4 @@ jira==3.4.0
 pdpyras==4.5.0
 pygithub==1.55
 GitPython==3.1.43
+lighthouse-python-plus==1.2.0

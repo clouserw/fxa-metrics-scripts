@@ -32,6 +32,8 @@ This is mildly sketchy.  This is a python project and you use the python buildpa
 heroku buildpacks:add --index 1 heroku/nodejs
 ```
 
+Update: it's getting sketchier!  Now I also need the npm `lighthouse` package to be installed.  Let's see if filling in package.json helps...
+
 ## Scheduling
 
 To run a cron job from a virtualenv:

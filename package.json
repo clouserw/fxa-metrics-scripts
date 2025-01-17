@@ -1,1 +1,9 @@
-{}
+{
+    "name": "fxa-metrics-scripts",
+    "version": "0.0.1",
+    "description": "Scripts for Firefox Accounts metrics",
+    "private": true,
+    "dependencies": {
+      "lighthouse": "^10.3.0"
+    }
+}
