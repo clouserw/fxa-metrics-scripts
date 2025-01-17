@@ -33,7 +33,7 @@ endpoints = [
 
 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 for endpoint in endpoints:
-    report = LighthouseRunner('https://accounts.firefox.com', form_factor='desktop', additional_settings=ADDITIONAL_SETTINGS, timings=TIMINGS, quiet=False).report
+    report = LighthouseRunner(endpoint, form_factor='desktop', additional_settings=ADDITIONAL_SETTINGS, timings=TIMINGS, quiet=False).report
 
     audits = report.audits(0) # the "zero" means everything is passing.  woo
 
