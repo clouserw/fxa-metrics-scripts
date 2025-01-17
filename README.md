@@ -1,7 +1,6 @@
 # fxa-metrics-scripts
 Simple scripts for compiling FxA metrics
 
-
 These scripts are most useful as an _example_ of how to pull from APIs.  To use
 the scripts directly you'd need to have Jira custom fields with the same IDs,
 spreadsheets with the same columns, etc.  Just go into this knowing you'll need
@@ -24,20 +23,6 @@ scripts.
 3. `source local.env`
 4. `python <script>`
 
-## Heroku
-
-This is mildly sketchy.  This is a python project and you use the python buildpack for it.  However, to calculate outdated dependencies for Mozilla Accounts I need the `yarn` command to exist.  Heroku will install it for me if it thinks I'm running a Node project, so, I have an empty `package.json` and `yarn.lock` file in the root and have told Heroku to run the `nodejs` builpack before the `python` one:
-
-```
-heroku buildpacks:add --index 1 heroku/nodejs
-```
-
-Update: it's getting sketchier!  Now I also need the npm `lighthouse` package to be installed.  Let's see if filling in package.json helps.  Lighthouse is not pulling in chrome.  Let's try this too:
-
-```
-heroku buildpacks:add --index 3 heroku-community/chrome-for-testing
-```
-
 ## Scheduling
 
 To run a cron job from a virtualenv:
@@ -52,5 +37,20 @@ To run a cron job with specific environment variables within a virtualenv:
 * * * * * . /path/to/fxa-metrics-scripts/local.env; /path/to/virtualenv/bin/python /path/to/fxa-metrics-scripts/copy_jira_data_to_sheets.py
 ```
 
-To run from heroku use the scheduling add-on with commands like `python
-<script>.py`
+
+## Heroku
+
+This is a python project and you should use a python buildpack for it.  You also need two additional buildpacks:
+
+```
+heroku buildpacks:add --index 1 heroku/nodejs
+heroku buildpacks:add --index 3 heroku-community/chrome-for-testing
+```
+
+You can run the commands on heroku to test them.  For example:
+
+```
+heroku run python calculate_lighthouse_scores.py
+```
+
+If you want to schedule them on heroku use the free Heroku Scheduler add-on.
