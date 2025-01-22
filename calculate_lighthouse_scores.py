@@ -3,10 +3,16 @@
 
 import datetime
 import os
+import argparse
 
 import gspread
 
 from lighthouse import LighthouseRunner
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description='Run Lighthouse audits and store results in a Google Spreadsheet.')
+parser.add_argument('--formfactor', type=str, default='desktop', choices=['desktop', 'mobile'], help='Form factor to use for Lighthouse audits (default: desktop)')
+args = parser.parse_args()
 
 credentials = {
     "type": "service_account",
@@ -33,43 +39,39 @@ endpoints = [
 
 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 for endpoint in endpoints:
-    report = LighthouseRunner(endpoint, form_factor='desktop', additional_settings=ADDITIONAL_SETTINGS, timings=TIMINGS, quiet=False).report
+    report = LighthouseRunner(endpoint, form_factor=args.formfactor, additional_settings=ADDITIONAL_SETTINGS, timings=TIMINGS, quiet=False).report
 
     audits = report.audits(0) # the "zero" means everything is passing.  woo
 
     _all_the_rows = [
-        [now, endpoint, 'performance', 'overall', report.score['performance'], report.score['performance']],
-        [now, endpoint, 'accessibility', 'overall', report.score['accessibility'], report.score['accessibility']],
-        [now, endpoint, 'seo', 'overall', report.score['seo'], report.score['seo']],
-        [now, endpoint, 'best-practices', 'overall', report.score['best-practices'], report.score['best-practices']],
+        [now, endpoint, 'performance', 'overall', report.score['performance'], report.score['performance'], args.formfactor],
+        [now, endpoint, 'accessibility', 'overall', report.score['accessibility'], report.score['accessibility'], args.formfactor],
+        [now, endpoint, 'seo', 'overall', report.score['seo'], report.score['seo'], args.formfactor],
+        [now, endpoint, 'best-practices', 'overall', report.score['best-practices'], report.score['best-practices'], args.formfactor],
     ]
 
     performance_audits = audits.get('performance')
     if performance_audits:
         for audit in performance_audits.passed:
-            #print(f"ID: {audit.id}, Score: {audit.score}, NumVal: {audit.numval}")
-            _row = [now, endpoint, 'performance', audit.id, audit.score, audit.numval]
+            _row = [now, endpoint, 'performance', audit.id, audit.score, audit.numval, args.formfactor]
             _all_the_rows.append(_row)
 
     a11y_audits = audits.get('accessibility')
     if a11y_audits:
         for audit in a11y_audits.passed:
-            #print(f"ID: {audit.id}, Score: {audit.score}, NumVal: {audit.numval}")
-            _row = [now, endpoint, 'accessibility', audit.id, audit.score, audit.numval]
+            _row = [now, endpoint, 'accessibility', audit.id, audit.score, audit.numval, args.formfactor]
             _all_the_rows.append(_row)
 
     bp_audits = audits.get('best-practices')
     if bp_audits:
         for audit in bp_audits.passed:
-            #print(f"ID: {audit.id}, Score: {audit.score}, NumVal: {audit.numval}")
-            _row = [now, endpoint, 'best-practices', audit.id, audit.score, audit.numval]
+            _row = [now, endpoint, 'best-practices', audit.id, audit.score, audit.numval, args.formfactor]
             _all_the_rows.append(_row)
 
     seo_audits = audits.get('seo')
     if seo_audits:
         for audit in seo_audits.passed:
-            #print(f"ID: {audit.id}, Score: {audit.score}, NumVal: {audit.numval}")
-            _row = [now, endpoint, 'seo', audit.id, audit.score, audit.numval]
+            _row = [now, endpoint, 'seo', audit.id, audit.score, audit.numval, args.formfactor]
             _all_the_rows.append(_row)
 
 wks = sh.worksheet('Lighthouse')
