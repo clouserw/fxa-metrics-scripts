@@ -58,7 +58,8 @@ export = [['key',
            'timetoresolve',
            'severity',
            'priority',
-           'labels']]
+           'labels',
+           'workcategory']]
 
 for issue in issues:
     try:
@@ -98,6 +99,12 @@ for issue in issues:
         else:
             _severity = ''
 
+        # Work Category
+        if issue.fields.customfield_12088:
+            _workcategory = issue.fields.customfield_12088.value
+        else:
+            _workcategory = ''
+
         # Labels
         _labels = ', '.join(issue.fields.labels)
 
@@ -136,7 +143,8 @@ for issue in issues:
                 _time_to_resolve,
                 _severity,
                 issue.fields.priority.id,
-                _labels
+                _labels,
+                _workcategory
         ]
 
         export.append(_row)
