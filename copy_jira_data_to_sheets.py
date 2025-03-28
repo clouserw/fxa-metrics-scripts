@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import traceback
 
 import gspread
 from jira import JIRA
@@ -27,7 +28,8 @@ issues = []
 while True:
     startAt = index * chunk
     #_issues = jira.search_issues('project=FXA and created > startOfDay(-5) order by id desc', startAt=startAt, maxResults=chunk)
-    _issues = jira.search_issues('project=FXA order by id desc', startAt=startAt, maxResults=chunk)
+    #_issues = jira.search_issues('project=FXA order by id desc', startAt=startAt, maxResults=chunk)
+    _issues = jira.search_issues('project=FXA and (component not in ("Subscription Platform") or component is empty) order by id desc', startAt=startAt, maxResults=chunk)
     #print(f"startat: {startAt} len: {len(_issues)}")
     if len(_issues):
         for i in _issues:
@@ -66,8 +68,11 @@ for issue in issues:
         # Assignee
         _assignee = ''
         if issue.fields.assignee:
-            if issue.fields.assignee.emailAddress:
-                _assignee = issue.fields.assignee.emailAddress
+            try:
+                if hasattr(issue.fields.assignee, 'emailAddress'):
+                    _assignee = issue.fields.assignee.emailAddress
+            except AttributeError:
+                pass
 
         # Found In
         if issue.fields.customfield_10217:
@@ -108,8 +113,6 @@ for issue in issues:
         # Labels
         _labels = ', '.join(issue.fields.labels)
 
-
-
         # Fix jira's ridiculous date to something reasonable. Jira dates come in like this 2022-01-11T16:35:33.833-0500
         _created = datetime.datetime.strptime(issue.fields.created.split('.')[0], '%Y-%m-%dT%H:%M:%S')
         _updated = datetime.datetime.strptime(issue.fields.updated.split('.')[0], '%Y-%m-%dT%H:%M:%S')
@@ -124,6 +127,14 @@ for issue in issues:
             _time_to_resolve = ''
             _open +=1
 
+        _reporter = ""        
+        if issue.fields.reporter:
+            try:
+                if hasattr(issue.fields.reporter, 'emailAddress'):
+                    _reporter = issue.fields.reporter.emailAddress
+            except AttributeError:
+                pass
+
         _row = [issue.key,
                 issue.permalink(),
                 issue.id,
@@ -131,7 +142,7 @@ for issue in issues:
                 _created.strftime('%Y-%m-%d %H:%M:%S'),
                 _found_in,
                 issue.fields.issuetype.name,
-                issue.fields.reporter.emailAddress,
+                _reporter,
                 _resolution,
                 _resolutiondate_string,
                 issue.fields.status.name,
@@ -150,7 +161,8 @@ for issue in issues:
         export.append(_row)
     except Exception as e:
         # exceptions started getting thrown with the move to atlassian host.
-        print(f"Caught exception: {e}")
+        print(f"Caught exception for issue {issue.key}: {e}")
+        traceback.print_exc()
 
 credentials = {
     "type": "service_account",
