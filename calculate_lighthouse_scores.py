@@ -44,34 +44,43 @@ for endpoint in endpoints:
     audits = report.audits(0) # the "zero" means everything is passing.  woo
 
     _all_the_rows = [
-        [now, endpoint, 'performance', 'overall', report.score['performance'], report.score['performance'], args.formfactor],
-        [now, endpoint, 'accessibility', 'overall', report.score['accessibility'], report.score['accessibility'], args.formfactor],
-        [now, endpoint, 'seo', 'overall', report.score['seo'], report.score['seo'], args.formfactor],
-        [now, endpoint, 'best-practices', 'overall', report.score['best-practices'], report.score['best-practices'], args.formfactor],
+        [now, endpoint, 'performance', 'overall', round(report.score['performance'], 2), round(report.score['performance'], 2), args.formfactor],
+        [now, endpoint, 'accessibility', 'overall', round(report.score['accessibility'], 2), round(report.score['accessibility'], 2), args.formfactor],
+        [now, endpoint, 'seo', 'overall', round(report.score['seo'], 2), round(report.score['seo'], 2), args.formfactor],
+        [now, endpoint, 'best-practices', 'overall', round(report.score['best-practices'], 2), round(report.score['best-practices'], 2), args.formfactor],
     ]
 
     performance_audits = audits.get('performance')
     if performance_audits:
         for audit in performance_audits.passed:
-            _row = [now, endpoint, 'performance', audit.id, audit.score, audit.numval, args.formfactor]
+            # Round score and numval to 2 decimal places
+            rounded_score = round(audit.score, 2) if audit.score is not None else audit.score
+            rounded_numval = round(audit.numval, 2) if audit.numval is not None else audit.numval
+            _row = [now, endpoint, 'performance', audit.id, rounded_score, rounded_numval, args.formfactor]
             _all_the_rows.append(_row)
 
     a11y_audits = audits.get('accessibility')
     if a11y_audits:
         for audit in a11y_audits.passed:
-            _row = [now, endpoint, 'accessibility', audit.id, audit.score, audit.numval, args.formfactor]
+            rounded_score = round(audit.score, 2) if audit.score is not None else audit.score
+            rounded_numval = round(audit.numval, 2) if audit.numval is not None else audit.numval
+            _row = [now, endpoint, 'accessibility', audit.id, rounded_score, rounded_numval, args.formfactor]
             _all_the_rows.append(_row)
 
     bp_audits = audits.get('best-practices')
     if bp_audits:
         for audit in bp_audits.passed:
-            _row = [now, endpoint, 'best-practices', audit.id, audit.score, audit.numval, args.formfactor]
+            rounded_score = round(audit.score, 2) if audit.score is not None else audit.score
+            rounded_numval = round(audit.numval, 2) if audit.numval is not None else audit.numval
+            _row = [now, endpoint, 'best-practices', audit.id, rounded_score, rounded_numval, args.formfactor]
             _all_the_rows.append(_row)
 
     seo_audits = audits.get('seo')
     if seo_audits:
         for audit in seo_audits.passed:
-            _row = [now, endpoint, 'seo', audit.id, audit.score, audit.numval, args.formfactor]
+            rounded_score = round(audit.score, 2) if audit.score is not None else audit.score
+            rounded_numval = round(audit.numval, 2) if audit.numval is not None else audit.numval
+            _row = [now, endpoint, 'seo', audit.id, rounded_score, rounded_numval, args.formfactor]
             _all_the_rows.append(_row)
 
 wks = sh.worksheet('Lighthouse')
