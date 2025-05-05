@@ -1,8 +1,7 @@
 gspread==5.4.0
 influxdb==5.3.1
-jira==3.4.0
+jira==3.8.0
 pdpyras==4.5.0
-pygithub==1.55
-GitPython==3.1.43
-lighthouse-python-plus==1.2.0
+PyGithub==1.55
+llighthouse-python-plus==1.2.0
 twilio==9.5.2
