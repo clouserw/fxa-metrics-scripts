@@ -25,7 +25,6 @@ os.chdir(targetdir)
 workspaces = {
 'fxa',
 '123done',
-'browserid-verifier',
 'db-migrations',
 'fortress',
 'functional-tests',
@@ -48,30 +47,30 @@ workspaces = {
 
 results = {}
 
-try:
-    for workspace in workspaces:
-        dependencies = 0
-        devdependencies = 0
-        total = 0
-        results[workspace] = {}
+for workspace in workspaces:
+    results[workspace] = {'dependencies': 0, 'devdependencies': 0, 'total': 0}
+    cmd = ['yarn', 'workspace', workspace, 'outdated', '--json']
+    res = subprocess.run(cmd, capture_output=True, text=True)
 
-        cmd = ['yarn', 'workspace', workspace, 'outdated', '--json']
-        res = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        if not res.stdout.strip():
+            print(f"No output from yarn for workspace: {workspace}")
+            continue
 
         r = json.loads(res.stdout)
+        for pkg in r:
+            pkg_type = pkg.get('type')
+            if pkg_type == 'dependencies':
+                results[workspace]['dependencies'] += 1
+            elif pkg_type == 'devDependencies':
+                results[workspace]['devdependencies'] += 1
 
-        for i in r:
-            if i['type'] == 'dependencies':
-                dependencies = dependencies + 1
-            if i['type'] == 'devDependencies':
-                devdependencies = devdependencies + 1
-
-        results[workspace]['dependencies'] = dependencies
-        results[workspace]['devdependencies'] = devdependencies
-        results[workspace]['total'] = dependencies + devdependencies
-
-except Exception as e:
-    print(f"Caught exception: {e}")
+        results[workspace]['total'] = (
+            results[workspace]['dependencies'] +
+            results[workspace]['devdependencies']
+        )
+    except Exception as e:
+        print(f"Failed to process workspace '{workspace}': {e}")
 
 
 credentials = {
