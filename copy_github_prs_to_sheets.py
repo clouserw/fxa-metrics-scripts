@@ -1,7 +1,7 @@
 import re
 import os
 import time
-from datetime import datetime
+from datetime import datetime, UTC
 import urllib3
 
 import gspread
@@ -11,9 +11,9 @@ from github import Github
 #     Closes: https://github.com/mozilla/fxa/issues/8423
 
 # re.compile('[Cc]lose(s|d)?:?\s?(https:\/\/github\.com\/[A-Za-z\/_-]*|#)?\d+'),
-expressions = [re.compile('[Ff]ix(ed|es)?:?\s?FXA-\d+'),
-               re.compile('[Cc]lose(s|d)?:?\s?FXA-\d+'),
-               re.compile('[Rr]esolve(s|d)?:?\s?FXA-\d+')]
+expressions = [re.compile(r'[Ff]ix(ed|es)?:?\s?FXA-\d+'),
+               re.compile(r'[Cc]lose(s|d)?:?\s?FXA-\d+'),
+               re.compile(r'[Rr]esolve(s|d)?:?\s?FXA-\d+')]
 
 # This isn't a perfect system because we have to parse the first comment.  Don't rely on these results for anything but approximation.
 # TODO: Don't use this.  these are paired to JIRA now.  We should be looking there.
@@ -66,7 +66,7 @@ for i in pulls:
 
     # This is actual reviewers, not just requested.  This includes all review states (eg. they might have rejected the patch).  This also doesn't deduplicate names if a person participates more than once.
     reviews = i.get_reviews()
-    _reviewers = ', '.join([str(review.user.login) for review in reviews])
+    _reviewers = ', '.join([str(review.user.login) for review in reviews if review.user])
 
     _has_an_issue = pr_has_an_issue(i)
 
@@ -90,11 +90,17 @@ for i in pulls:
     export.append(_row)
 
     _rate_limit = g.get_rate_limit()
-    _rate_limit_reset = (_rate_limit.core.reset - datetime.utcnow()).seconds /60
+
+    # Patch for naive datetime to add tz info
+    _reset_time = _rate_limit.core.reset
+    if _reset_time.tzinfo is None:
+        _reset_time = _reset_time.replace(tzinfo=UTC)
+
+    _rate_limit_reset = (_reset_time - datetime.now(UTC)).seconds / 60
 
     #print(f"Used: Core ({_rate_limit.core.remaining}/{_rate_limit.core.limit}) Resets in {_rate_limit_reset:.1f} min")
     if _rate_limit.core.remaining < 2:
-        _seconds = (_rate_limit.core.reset - datetime.utcnow()).seconds + 5
+        _seconds = (_reset_time - datetime.now(UTC)).seconds + 5
         #print(f"Hit rate limit.  Sleeping for: {_seconds} seconds")
         time.sleep(_seconds)
     #print(f"Used: Search ({_rate_limit.search.remaining}/{_rate_limit.search.limit}) Resets {_rate_limit.search.reset.strftime('%H:%M:%S')}")
